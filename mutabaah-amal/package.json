@@ -1,0 +1,11 @@
+{
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "generate": "drizzle-kit generate:pg",
+    "push": "drizzle-kit push:pg"
+  }
+}
+

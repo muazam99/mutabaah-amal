@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button"
 
 export default function Home() {
   const [code, setCode] = useState('')
-  const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
 
@@ -16,7 +15,6 @@ export default function Home() {
     setError('')
 
     try {
-      setLoading(true)
       const response = await fetch('/api/circles/validate', {
         method: 'POST',
         headers: {
@@ -24,12 +22,11 @@ export default function Home() {
         },
         body: JSON.stringify({ code }),
       })
-      
-      setLoading(false)
+
       const data = await response.json()
-      console.log(data);
+
       if (data.valid) {
-        router.push(`/circle/${data.circleId}`)
+        router.push(`/select-member/${data.circleId}`)
       } else {
         setError('Invalid circle code. Please try again.')
       }
@@ -57,7 +54,7 @@ export default function Home() {
           value={code}
           onChange={(e) => setCode(e.target.value)}
         />
-        <Button type="submit" className="w-full bg-[#333333] hover:bg-[#444444]" disabled={loading}>Enter</Button>
+        <Button type="submit" className="w-full bg-[#333333] hover:bg-[#444444]">Enter</Button>
         {error && <p className="mt-2 text-red-500">{error}</p>}
       </form>
     </main>
