@@ -39,11 +39,13 @@ export const userTaskCompletions = pgTable("user_task_completions", {
   completionId: serial("completion_id").primaryKey(),
   userId: integer("user_id").references(() => users.userId),
   taskId: integer("task_id").references(() => tasks.taskId),
-  completedDate: date("completed_date").notNull(),
-  quantityCompleted: numeric("quantity_completed")
+  updatedAt: date("updated_at").notNull(),
+  quantityCompleted: numeric("quantity_completed"),
+  taskDateFrom: date("task_date_from").notNull(),
+  taskDateTo: date("task_date_to").notNull()
 }, (table) => {
   return {
-    unq: uniqueIndex("user_task_date_unique").on(table.userId, table.taskId, table.completedDate)
+    unq: uniqueIndex("user_task_date_unique").on(table.userId, table.taskId, table.updatedAt)
   }
 });
 

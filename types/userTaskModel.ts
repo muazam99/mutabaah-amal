@@ -5,5 +5,5 @@ export interface UserTask {
     frequencyCount: number;
     description: string | null;
     quantityCompleted: string | null;
-    completedDate: string | null;
+    updatedAt: string | null;
 }

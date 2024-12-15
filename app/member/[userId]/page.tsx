@@ -89,7 +89,7 @@ export default function TaskPage({ params }: { params: { userId: number } }) {
                     <span> /{getMaxFrequenceFromFrequencyType(task.frequencyType)}</span>
                   </div>
                 </TableCell>
-                <TableCell>{task.completedDate || 'Not completed'}</TableCell>
+                <TableCell>{task.updatedAt || 'Not completed'}</TableCell>
               </TableRow>
             ))}
           </TableBody>

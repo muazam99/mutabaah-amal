@@ -26,7 +26,7 @@ export const getUserTasks = cache( async (userId: number) => {
       frequencyCount: tasks.frequencyCount,
       description: tasks.description,
       quantityCompleted: userTaskCompletions.quantityCompleted,
-      completedDate: userTaskCompletions.completedDate
+      updatedAt: userTaskCompletions.updatedAt
     })
     .from(tasks)
     .innerJoin(circleMembers, eq(tasks.circleId, circleMembers.circleId))
