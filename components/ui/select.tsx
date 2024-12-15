@@ -14,20 +14,23 @@ const SelectValue = SelectPrimitive.Value
 
 interface WeekSelectorProps extends React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger> {
   onWeekChange?: (startDate: Date, endDate: Date) => void
+  initialWeek?: Date
 }
 
 const WeekSelector = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Trigger>,
   WeekSelectorProps
->(({ className, children, onWeekChange, ...props }, ref) => {
-  const [currentWeek, setCurrentWeek] = React.useState(new Date(2024, 11, 5)) // December 5, 2024
+>(({ className, onWeekChange, initialWeek, ...props }, ref) => {
+  const [currentWeek, setCurrentWeek] = React.useState(
+    initialWeek ? startOfWeek(initialWeek, { weekStartsOn: 4 }) : startOfWeek(new Date(2024, 11, 5), { weekStartsOn: 4 })
+  )
 
   const handlePrevWeek = (e: React.MouseEvent) => {
     e.preventDefault()
     const newWeek = addWeeks(currentWeek, -1)
     setCurrentWeek(newWeek)
     if (onWeekChange) {
-      onWeekChange(startOfWeek(newWeek), endOfWeek(newWeek))
+      onWeekChange(startOfWeek(newWeek, { weekStartsOn: 4 }), endOfWeek(newWeek, { weekStartsOn: 4 }))
     }
   }
 
@@ -36,18 +39,18 @@ const WeekSelector = React.forwardRef<
     const newWeek = addWeeks(currentWeek, 1)
     setCurrentWeek(newWeek)
     if (onWeekChange) {
-      onWeekChange(startOfWeek(newWeek), endOfWeek(newWeek))
+      onWeekChange(startOfWeek(newWeek, { weekStartsOn: 4 }), endOfWeek(newWeek, { weekStartsOn: 4 }))
     }
   }
 
   const formatDateRange = (date: Date) => {
-    const start = startOfWeek(date)
-    const end = endOfWeek(date)
+    const start = startOfWeek(date, { weekStartsOn: 4 })
+    const end = endOfWeek(date, { weekStartsOn: 4 })
     return `${format(start, 'MMM d')} - ${format(end, 'MMM d')}`
   }
 
   return (
-    <SelectPrimitive.Trigger
+    <div
       ref={ref}
       className={cn(
         "flex h-10 w-full items-center justify-between rounded-md border border-light-blue bg-white px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-light-blue focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
@@ -64,7 +67,7 @@ const WeekSelector = React.forwardRef<
         className="h-4 w-4 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
         onClick={handleNextWeek}
       />
-    </SelectPrimitive.Trigger>
+    </div>
   )
 })
 WeekSelector.displayName = "WeekSelector"

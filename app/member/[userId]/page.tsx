@@ -8,19 +8,19 @@ import { getUserTasks } from '@/db/queries'
 import { useState, useEffect } from 'react'
 import { set } from 'date-fns'
 import { UserTask } from '@/types/userTaskModel'
-import { getMaxFrequenceFromFrequencyType } from '@/components/utils/util'
+import { getCurrentWeek, getMaxFrequenceFromFrequencyType } from '@/components/utils/util'
 
 
 
 export default function TaskPage({ params }: { params: { userId: number } }) {
-  const [selectedWeek, setSelectedWeek] = useState<[Date, Date] | null>(null)
+  const [selectedWeek, setSelectedWeek] = useState<[Date, Date]>(getCurrentWeek());
   const [tasks, setTasks] = useState<UserTask[]>([]);
 
  
 
   const handleWeekChange = (startDate: Date, endDate: Date) => {
-    // setSelectedWeek([startDate, endDate])
-    // Here you would typically fetch tasks for the new week
+    setSelectedWeek([startDate, endDate])
+    console.log(selectedWeek);
   }
 
   const handleSubmit = () => {
@@ -33,7 +33,6 @@ export default function TaskPage({ params }: { params: { userId: number } }) {
     const [tasksData] = await Promise.all([
       userTasksData,
     ]);
-    console.log(tasksData);
     setTasks(tasksData);
   }
 
@@ -55,7 +54,9 @@ export default function TaskPage({ params }: { params: { userId: number } }) {
       
       <div className="flex justify-between items-center mb-6">
         <Select>
-          <WeekSelector className="w-[150px]" onWeekChange={handleWeekChange} />
+          <WeekSelector className="w-[150px]" onWeekChange={handleWeekChange}
+          initialWeek={selectedWeek[0]}
+          />
           <SelectContent>
             {/* You can add custom content here if needed */}
           </SelectContent>
