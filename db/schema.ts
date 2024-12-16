@@ -44,10 +44,6 @@ export const userTaskCompletions = pgTable("user_task_completions", {
   quantityCompleted: numeric("quantity_completed"),
   taskDateFrom: date("task_date_from").notNull(),
   taskDateTo: date("task_date_to").notNull()
-}, (table) => {
-  return {
-    unq: uniqueIndex("user_task_date_unique").on(table.userId, table.taskId, table.updatedAt)
-  }
 });
 
 export const userTaskCompletionRelations = relations(userTaskCompletions, ({ one }) => ({

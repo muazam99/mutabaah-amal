@@ -1,4 +1,5 @@
 export interface UserTask {
+    completionId: number | null;
     taskId: number;
     name: string;
     frequencyType: string;

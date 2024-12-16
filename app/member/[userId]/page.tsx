@@ -1,18 +1,25 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Select, SelectContent, WeekSelector } from '@/components/ui/select'
+import { Select, WeekSelector } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Input } from '@/components/ui/input'
-import { getCircleTasks, getUserTasks } from '@/db/queries'
+import { getUserById, getUserNameById, getUserTasks, submitUserTasks } from '@/db/queries'
 import { useState, useEffect } from 'react'
-import { set } from 'date-fns'
-import { Task, UserTask } from '@/types/userTaskModel'
+import { UserTask } from '@/types/userTaskModel'
 import { getCurrentWeek, getMaxFrequenceFromFrequencyType } from '@/components/utils/util'
+import { useRouter } from 'next/navigation'
+import { set } from 'date-fns'
+import Loading from './loading'
+import { useToast } from '@/hooks/use-toast'
+import { Loader } from 'lucide-react'
 
 
 
 export default function TaskPage({ params }: { params: { userId: number } }) {
+  const { toast } = useToast();
+  const router = useRouter();
+  const [userName, setUserName] = useState('');
   const [selectedWeek, setSelectedWeek] = useState<[Date, Date]>(getCurrentWeek());
   const [completedTasks, setCompletedTasks] = useState<UserTask[]>([]);
   const [inputValues, setInputValues] = useState(
@@ -21,15 +28,39 @@ export default function TaskPage({ params }: { params: { userId: number } }) {
       return acc;
     }, {})
   );
+  const [loading, setLoading] = useState(false);
 
   const handleWeekChange = async (startDate: Date, endDate: Date) => {
     setSelectedWeek([startDate, endDate]);
   }
 
   const handleSubmit = () => {
-    // Handle submitting changes
-    console.log('Submitting changes...')
+    setLoading(true);
+    const updatedTasks = completedTasks.map((task) => {
+      const inputValue = inputValues[task.taskId];
+      return {
+        ...task,
+        updatedAt: new Date().toDateString(),
+        quantityCompleted: inputValue,
+        taskDateFrom: selectedWeek[0].toDateString(),
+        taskDateTo: selectedWeek[1].toDateString(),
+      };
+    });
+
+    submitUserTasks(params.userId, updatedTasks).then(() => {
+      toast({
+        variant: "success",
+        title: "Success",
+        description: "Successfully updated tasks",
+      });
+      setLoading(false);
+      fetchCompletedTasks();
+    });
   }
+
+  const handleGoBack = () => {
+    router.back(); // Navigates to the previous page
+  };
 
   const handleInputChange = (taskId: any, value: any) => {
     setInputValues((prevValues: any) => ({
@@ -51,6 +82,14 @@ export default function TaskPage({ params }: { params: { userId: number } }) {
     setCompletedTasks(tasksData);
   }
 
+  // fetch userNameById
+  useEffect(() => {
+    const userData = getUserById(params.userId);
+    userData.then((data) => {
+      setUserName(data.username);
+    });
+  }, []);
+
   useEffect(() => {
     setInputValues(
       completedTasks.reduce((acc: any, task) => {
@@ -65,19 +104,14 @@ export default function TaskPage({ params }: { params: { userId: number } }) {
     fetchCompletedTasks();
   }, [selectedWeek]);
 
-  // if (loading) {
-  //   return <div>Loading...</div>
-  // }
-
-  // if (error) {
-  //   return <div>{error}</div>
-  // }
-
   return (
     <div className="container mx-auto p-8">
-      <h1 className="text-2xl font-bold mb-6 text-center">Ahlan Wasahlan, User</h1>
+      <h1 className="text-2xl font-bold mb-6 text-center">Ahlan Wasahlan, {userName}</h1>
       
       <div className="flex justify-between items-center mb-6">
+        <Button variant="outline" className='w-[100px] mr-4' onClick={handleGoBack}>
+          Back
+        </Button>
         <Select>
           <WeekSelector className="w-full" onWeekChange={handleWeekChange}
           initialWeek={selectedWeek[0]}
@@ -120,7 +154,12 @@ export default function TaskPage({ params }: { params: { userId: number } }) {
       </div>
 
       <div className="mt-4 flex justify-end">
-        <Button onClick={handleSubmit}>Submit Changes</Button>
+        <Button onClick={handleSubmit} disabled={loading}>
+          {loading ? 
+             <Loader className="h-6 w-6 text-muted-foreground animate-spin"/>
+            : 
+          'Submit Changes'}
+        </Button>
       </div>
     </div>
   )

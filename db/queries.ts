@@ -1,9 +1,8 @@
 import { cache } from "react";
 import { db } from "./db";
 import { circleMembers, tasks, users, userTaskCompletions } from "./schema";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { Task, UserTask } from "@/types/userTaskModel";
-
 
 export const getCircleMembers = cache( async (circleId: number) => {
     const members = await db.select({
@@ -54,6 +53,7 @@ export const getUserTasks = cache( async (userId: number, fromDate: any, toDate:
 
   const userTasks = await db
   .select({
+    completionId: userTaskCompletions.completionId,
     taskId: tasks.taskId,
     name: tasks.name,
     frequencyType: tasks.frequencyType,
@@ -77,4 +77,45 @@ export const getUserTasks = cache( async (userId: number, fromDate: any, toDate:
     .where(eq(circleMembers.userId, userId));
   
   return userTasks;
+});
+
+export const submitUserTasks = cache( async (userId: number, tasks: UserTask[]) => {
+
+  const values = tasks.map((task) => {
+    return {
+      ...(task.completionId !== null ? { completionId: task.completionId } : {}),
+      userId: userId,
+      taskId: task.taskId,
+      quantityCompleted: task.quantityCompleted,
+      updatedAt: task.updatedAt!,
+      taskDateFrom: task.taskDateFrom!,
+      taskDateTo: task.taskDateTo!,
+    }
+  });
+  
+
+  const userTasks = await db
+  .insert(userTaskCompletions)
+  .values(values)
+  .onConflictDoUpdate({
+    target: [userTaskCompletions.completionId],
+    set: {
+      quantityCompleted: sql.raw(`excluded.${userTaskCompletions.quantityCompleted.name}`),
+    }
+  })
+  .returning();
+
+  return userTasks;
+});
+
+
+// get user name by id
+export const getUserById = cache( async (userId: number) => {
+  const user = await db.select({  
+    userId: users.userId,
+    email: users.email,
+    username: users.username})
+  .from(users).where(eq(users.userId, userId));
+
+  return user[0];
 });
