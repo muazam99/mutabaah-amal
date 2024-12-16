@@ -5,7 +5,8 @@ import { getCircleMembers } from '@/db/queries'
 import Link from 'next/link';
 
 
-export default async function SelectMember({ params }: { params: { circleId: number } }) {
+export default async function SelectMember(props: { params: Promise<{ circleId: number }> }) {
+  const params = await props.params;
   const circleMembersData = getCircleMembers(params.circleId);
 
   const [membersData] = await Promise.all([

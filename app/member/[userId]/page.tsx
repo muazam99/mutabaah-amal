@@ -5,7 +5,7 @@ import { Select, WeekSelector } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Input } from '@/components/ui/input'
 import { getUserById, getUserTasks, submitUserTasks } from '@/db/queries'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, use } from 'react';
 import { UserTask } from '@/types/userTaskModel'
 import { getCurrentWeek, getMaxFrequenceFromFrequencyType } from '@/components/utils/util'
 import { useRouter } from 'next/navigation'
@@ -16,7 +16,8 @@ import { Loader } from 'lucide-react'
 
 
 
-export default function TaskPage({ params }: { params: { userId: number } }) {
+export default function TaskPage(props: { params: Promise<{ userId: number }> }) {
+  const params = use(props.params);
   const { toast } = useToast();
   const router = useRouter();
   const [userName, setUserName] = useState('');
@@ -110,7 +111,7 @@ export default function TaskPage({ params }: { params: { userId: number } }) {
       
       <div className="flex justify-between items-center mb-6">
         <Button variant="outline" className='w-[100px] mr-4' onClick={handleGoBack}>
-          Back
+          Kembali
         </Button>
         <Select>
           <WeekSelector className="w-full" onWeekChange={handleWeekChange}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, use } from 'react';
 import { ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, WeekSelector } from '@/components/ui/select'
@@ -14,7 +14,8 @@ import { Member } from '@/types/memberModel'
 import { UserTask } from '@/types/userTaskModel'
 import { set } from 'date-fns'
 
-export default function NaqibPage({ params }: { params: { circleId: number } }) {
+export default function NaqibPage(props: { params: Promise<{ circleId: number }> }) {
+  const params = use(props.params);
   const router = useRouter();
   const [selectedWeek, setSelectedWeek] = useState<[Date, Date]>(getCurrentWeek());
   const [members, setMembers] = useState<Member[]>([]);
@@ -27,7 +28,7 @@ export default function NaqibPage({ params }: { params: { circleId: number } }) 
   const handleGoBack = () => {
     router.back(); // Navigates to the previous page
   };
-  
+
   const getMembersData = async() => {
     const membersData = getCircleMembers(params.circleId);
     const [membersList] = await Promise.all([
@@ -77,7 +78,7 @@ export default function NaqibPage({ params }: { params: { circleId: number } }) 
       
       <div className="flex justify-between items-center mb-6">
         <Button variant="outline" className='w-[100px] mr-4' onClick={handleGoBack}>
-          Back
+          Kembali
         </Button>
         <Select>
           <WeekSelector className="w-full" onWeekChange={handleWeekChange}
