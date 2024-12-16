@@ -145,7 +145,7 @@ export default function TaskPage(props: { params: Promise<{ userId: number }> })
                     <span> /{getMaxFrequenceFromFrequencyType(task.frequencyType)}</span>
                   </div>
                 </TableCell>
-                <TableCell>{task.updatedAt || 'Not completed'}</TableCell>
+                <TableCell>{task.updatedAt || 'Tidak dikemaskini'}</TableCell>
               </TableRow>
             ))}
           </TableBody>
