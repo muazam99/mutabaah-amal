@@ -1,3 +1,4 @@
+import { relations } from "drizzle-orm";
 import { pgTable, serial, varchar, text, timestamp, integer, numeric, date, primaryKey, uniqueIndex } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
@@ -48,4 +49,15 @@ export const userTaskCompletions = pgTable("user_task_completions", {
     unq: uniqueIndex("user_task_date_unique").on(table.userId, table.taskId, table.updatedAt)
   }
 });
+
+export const userTaskCompletionRelations = relations(userTaskCompletions, ({ one }) => ({
+  task: one(tasks, {
+    fields: [userTaskCompletions.taskId],
+    references: [tasks.taskId]
+  }),
+  user: one(users, {
+    fields: [userTaskCompletions.userId],
+    references: [users.userId]
+  }),
+}));
 

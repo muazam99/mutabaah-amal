@@ -4,23 +4,26 @@ import { Button } from '@/components/ui/button'
 import { Select, SelectContent, WeekSelector } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Input } from '@/components/ui/input'
-import { getUserTasks } from '@/db/queries'
+import { getCircleTasks, getUserTasks } from '@/db/queries'
 import { useState, useEffect } from 'react'
 import { set } from 'date-fns'
-import { UserTask } from '@/types/userTaskModel'
+import { Task, UserTask } from '@/types/userTaskModel'
 import { getCurrentWeek, getMaxFrequenceFromFrequencyType } from '@/components/utils/util'
 
 
 
 export default function TaskPage({ params }: { params: { userId: number } }) {
   const [selectedWeek, setSelectedWeek] = useState<[Date, Date]>(getCurrentWeek());
-  const [tasks, setTasks] = useState<UserTask[]>([]);
+  const [completedTasks, setCompletedTasks] = useState<UserTask[]>([]);
+  const [inputValues, setInputValues] = useState(
+    completedTasks.reduce((acc: any, task) => {
+      acc[task.taskId] = task.quantityCompleted || 0;
+      return acc;
+    }, {})
+  );
 
- 
-
-  const handleWeekChange = (startDate: Date, endDate: Date) => {
-    setSelectedWeek([startDate, endDate])
-    console.log(selectedWeek);
+  const handleWeekChange = async (startDate: Date, endDate: Date) => {
+    setSelectedWeek([startDate, endDate]);
   }
 
   const handleSubmit = () => {
@@ -28,17 +31,39 @@ export default function TaskPage({ params }: { params: { userId: number } }) {
     console.log('Submitting changes...')
   }
 
-  const fetchTasks = async () => {
-    const userTasksData = getUserTasks(params.userId);
+  const handleInputChange = (taskId: any, value: any) => {
+    setInputValues((prevValues: any) => ({
+      ...prevValues,
+      [taskId]: Number(value),
+    }));
+  };
+
+  const fetchCompletedTasks = async () => {
+    const userTasksData = getUserTasks(
+      params.userId,
+      selectedWeek[0],
+      selectedWeek[1],
+    );
     const [tasksData] = await Promise.all([
       userTasksData,
     ]);
-    setTasks(tasksData);
+    console.log(tasksData);
+    setCompletedTasks(tasksData);
   }
 
   useEffect(() => {
-    fetchTasks();
-  }, [])
+    setInputValues(
+      completedTasks.reduce((acc: any, task) => {
+        acc[task.taskId] = task.quantityCompleted || 0;
+        return acc;
+      }, {})
+    );
+  }, [completedTasks]);
+
+
+  useEffect(() => {
+    fetchCompletedTasks();
+  }, [selectedWeek]);
 
   // if (loading) {
   //   return <div>Loading...</div>
@@ -54,12 +79,9 @@ export default function TaskPage({ params }: { params: { userId: number } }) {
       
       <div className="flex justify-between items-center mb-6">
         <Select>
-          <WeekSelector className="w-[150px]" onWeekChange={handleWeekChange}
+          <WeekSelector className="w-full" onWeekChange={handleWeekChange}
           initialWeek={selectedWeek[0]}
           />
-          <SelectContent>
-            {/* You can add custom content here if needed */}
-          </SelectContent>
         </Select>
         {/* <Button variant="outline">Edit</Button> */}
       </div>
@@ -74,14 +96,15 @@ export default function TaskPage({ params }: { params: { userId: number } }) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {tasks?.map((task) => (
+            {completedTasks?.map((task) => (
               <TableRow key={task.taskId}>
                 <TableCell>{task.name}</TableCell>
                 <TableCell>
                   <div className="flex items-center">
                     <Input 
                       type="number" 
-                      defaultValue={task.quantityCompleted || 0}
+                      value={inputValues[task.taskId]}
+                      onChange={(e) => handleInputChange(task.taskId, e.target.value)}
                       className='w-[60px] mr-2'
                       min={0}
                       max={getMaxFrequenceFromFrequencyType(task.frequencyType)}

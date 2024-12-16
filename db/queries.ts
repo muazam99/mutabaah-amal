@@ -2,6 +2,7 @@ import { cache } from "react";
 import { db } from "./db";
 import { circleMembers, tasks, users, userTaskCompletions } from "./schema";
 import { and, eq } from "drizzle-orm";
+import { Task, UserTask } from "@/types/userTaskModel";
 
 
 export const getCircleMembers = cache( async (circleId: number) => {
@@ -17,26 +18,62 @@ export const getCircleMembers = cache( async (circleId: number) => {
     return members;
 });
 
-export const getUserTasks = cache( async (userId: number) => {
+export const getCircleTasks = cache( async (circleId: number) => {
+  const taskList = await db.select().from(tasks).where(eq(tasks.circleId, circleId));
+  // transform to TaskModel
+
+  const result = <Task[]>[];
+
+  for (let i = 0; i < taskList.length; i++) {
+    const task = taskList[i];
+    result.push({ 
+      taskId: task.taskId,
+      circleId: task.circleId,
+      name: task.name,
+      frequencyType: task.frequencyType,
+      frequencyCount: task.frequencyCount,
+      description: task.description,
+    });
+  }
+
+  return result;
+})
+
+export const getUserTasks = cache( async (userId: number, fromDate: any, toDate: any) => {
+  // const userTasks = await db.query.userTaskCompletions.findMany({
+  //   with: {
+  //     task: true,
+  //     user: true,
+  //   },
+  //   where: and(
+  //     eq(userTaskCompletions.userId, userId),
+  //     eq(userTaskCompletions.taskDateFrom, fromDate),
+  //     eq(userTaskCompletions.taskDateTo, toDate),
+  //   )
+  // });
+
   const userTasks = await db
-    .select({
-      taskId: tasks.taskId,
-      name: tasks.name,
-      frequencyType: tasks.frequencyType,
-      frequencyCount: tasks.frequencyCount,
-      description: tasks.description,
-      quantityCompleted: userTaskCompletions.quantityCompleted,
-      updatedAt: userTaskCompletions.updatedAt
-    })
-    .from(tasks)
-    .innerJoin(circleMembers, eq(tasks.circleId, circleMembers.circleId))
-    .leftJoin(
-      userTaskCompletions,
-      and(
-        eq(userTaskCompletions.taskId, tasks.taskId),
-        eq(userTaskCompletions.userId, userId)
-      )
-    )
+  .select({
+    taskId: tasks.taskId,
+    name: tasks.name,
+    frequencyType: tasks.frequencyType,
+    frequencyCount: tasks.frequencyCount,
+    description: tasks.description,
+    quantityCompleted: userTaskCompletions.quantityCompleted,
+    updatedAt: userTaskCompletions.updatedAt,
+    taskDateFrom: userTaskCompletions.taskDateFrom,
+    taskDateTo: userTaskCompletions.taskDateTo
+  })
+  .from(tasks)
+  .innerJoin(circleMembers, eq(tasks.circleId, circleMembers.circleId))
+  .leftJoin(
+    userTaskCompletions,
+    and(
+      eq(userTaskCompletions.taskId, tasks.taskId),
+      eq(userTaskCompletions.userId, userId),
+      eq(userTaskCompletions.taskDateFrom, fromDate),
+      eq(userTaskCompletions.taskDateTo, toDate)
+    ))
     .where(eq(circleMembers.userId, userId));
   
   return userTasks;
