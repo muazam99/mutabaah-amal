@@ -79,7 +79,6 @@ export default function TaskPage(props: { params: Promise<{ userId: number }> })
     const [tasksData] = await Promise.all([
       userTasksData,
     ]);
-    console.log(tasksData);
     setCompletedTasks(tasksData);
   }
 
@@ -133,7 +132,7 @@ export default function TaskPage(props: { params: Promise<{ userId: number }> })
           <TableBody>
             {completedTasks?.map((task) => (
               <TableRow key={task.taskId}>
-                <TableCell>{task.name}</TableCell>
+                <TableCell>{task.description}</TableCell>
                 <TableCell>
                   <div className="flex items-center">
                     <Input 

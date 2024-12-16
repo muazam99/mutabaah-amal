@@ -108,7 +108,7 @@ export default function NaqibPage(props: { params: Promise<{ circleId: number }>
                   <TableBody>
                     {tasks[member.userId] !== undefined && tasks[member.userId].map((task) => (
                       <TableRow key={task.taskId}>
-                        <TableCell>{task.name}</TableCell>
+                        <TableCell>{task.description}</TableCell>
                         <TableCell>
                           <div className="flex items-center">
                             <span className='mr-1'>{task.quantityCompleted ?? 0}</span>
