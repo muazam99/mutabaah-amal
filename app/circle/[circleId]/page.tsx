@@ -40,11 +40,12 @@ export default async function SelectMember({ params }: { params: { circleId: num
             </IconButton>
         ))}
 
-        {/* <Button 
+        <Button 
           className="w-full bg-[#333333] hover:bg-[#444444] text-white"
+          asChild
         >
-          Tambah Ahli
-        </Button> */}
+          <Link href="/">Keluar</Link> 
+        </Button>
       </div>
     </div>
   )

@@ -8,6 +8,7 @@ export const getCircleMembers = cache( async (circleId: number) => {
     const members = await db.select({
       userId: users.userId,
       username: users.username,
+      email: users.email,
       role: circleMembers.role
     })
     .from(circleMembers)
