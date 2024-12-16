@@ -50,7 +50,7 @@ const WeekSelector = React.forwardRef<
   }
 
   return (
-    <div
+    <SelectPrimitive.Trigger
       ref={ref}
       className={cn(
         "flex h-10 w-full items-center justify-between rounded-md border border-light-blue bg-white px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-light-blue focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
@@ -67,7 +67,7 @@ const WeekSelector = React.forwardRef<
         className="h-4 w-4 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
         onClick={handleNextWeek}
       />
-    </div>
+    </SelectPrimitive.Trigger>
   )
 })
 WeekSelector.displayName = "WeekSelector"
