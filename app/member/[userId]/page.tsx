@@ -25,7 +25,7 @@ export default function TaskPage(props: { params: Promise<{ userId: number }> })
   const [completedTasks, setCompletedTasks] = useState<UserTask[]>([]);
   const [inputValues, setInputValues] = useState(
     completedTasks.reduce((acc: any, task) => {
-      acc[task.taskId] = task.quantityCompleted || 0;
+      acc[task.taskId] = task.quantityCompleted;
       return acc;
     }, {})
   );
@@ -93,7 +93,7 @@ export default function TaskPage(props: { params: Promise<{ userId: number }> })
   useEffect(() => {
     setInputValues(
       completedTasks.reduce((acc: any, task) => {
-        acc[task.taskId] = task.quantityCompleted || 0;
+        acc[task.taskId] = task.quantityCompleted;
         return acc;
       }, {})
     );
@@ -140,7 +140,6 @@ export default function TaskPage(props: { params: Promise<{ userId: number }> })
                       value={inputValues[task.taskId]}
                       onChange={(e) => handleInputChange(task.taskId, e.target.value)}
                       className='w-[60px] mr-2'
-                      min={0}
                       max={getMaxFrequenceFromFrequencyType(task.frequencyType)}
                     />
                     <span> /{getMaxFrequenceFromFrequencyType(task.frequencyType)}</span>
