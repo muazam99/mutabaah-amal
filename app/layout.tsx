@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Mutabaah Amal',
-  description: 'A shared todo app for circles',
+  description: 'Memudahkan pengurusan mutabaah amal untuk usrah anda',
 }
 
 export default function RootLayout({
