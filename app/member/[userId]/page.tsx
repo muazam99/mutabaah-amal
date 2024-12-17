@@ -137,7 +137,7 @@ export default function TaskPage(props: { params: Promise<{ userId: number }> })
                   <div className="flex items-center">
                     <Input 
                       type="number" 
-                      value={inputValues[task.taskId]}
+                      value={inputValues[task.taskId] ?? 0}
                       onChange={(e) => handleInputChange(task.taskId, e.target.value)}
                       className='w-[60px] mr-2'
                       max={getMaxFrequenceFromFrequencyType(task.frequencyType)}
