@@ -12,7 +12,7 @@ import { useRouter } from 'next/navigation'
 import { set } from 'date-fns'
 import Loading from './loading'
 import { useToast } from '@/hooks/use-toast'
-import { Loader } from 'lucide-react'
+import { Loader, MinusIcon, PlusIcon } from 'lucide-react'
 
 
 
@@ -135,13 +135,19 @@ export default function TaskPage(props: { params: Promise<{ userId: number }> })
                 <TableCell>{task.description}</TableCell>
                 <TableCell>
                   <div className="flex items-center">
+                    <button onClick={() => handleInputChange(task.taskId, (inputValues[task.taskId] ?? 0) - 1)} className="mr-2">
+                      <MinusIcon />
+                    </button>
                     <Input 
                       type="number" 
                       value={inputValues[task.taskId] ?? 0}
-                      onChange={(e) => handleInputChange(task.taskId, e.target.value)}
-                      className='w-[60px] mr-2'
+                      className='w-[60px]'
                       max={getMaxFrequenceFromFrequencyType(task.frequencyType)}
+                      readOnly
                     />
+                    <button onClick={() => handleInputChange(task.taskId, (inputValues[task.taskId] ?? 0) + 1)} className="ml-2">
+                      <PlusIcon />
+                    </button>
                     <span> /{getMaxFrequenceFromFrequencyType(task.frequencyType)}</span>
                   </div>
                 </TableCell>
